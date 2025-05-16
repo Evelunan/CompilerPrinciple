@@ -1,36 +1,100 @@
 #include "token.h"
-#include <unordered_map>
+#include <QDebug>
 
 Token::Token(TokenType type, const QString& value, int line)
     : type(type), value(value), line(line) {}
 
 QString getTokenTypeString(TokenType type) {
-    static const std::unordered_map<TokenType, QString> tokenTypeStrings = {
-        {TokenType::PLUS, "PLUS"}, {TokenType::MINUS, "MINUS"}, {TokenType::MULTIPLY, "MULTIPLY"},
-        {TokenType::DIVIDE, "DIVIDE"}, {TokenType::EQUAL, "EQUAL"}, {TokenType::NOT_EQUAL, "NOT_EQUAL"},
-        {TokenType::LESS, "LESS"}, {TokenType::GREATER, "GREATER"}, {TokenType::ASSIGNMENT, "ASSIGNMENT"},
-        {TokenType::LEFT_PAREN, "LEFT_PAREN"}, {TokenType::RIGHT_PAREN, "RIGHT_PAREN"},
-        {TokenType::SEMICOLON, "SEMICOLON"}, {TokenType::LEFT_BRACE, "LEFT_BRACE"},
-        {TokenType::RIGHT_BRACE, "RIGHT_BRACE"}, {TokenType::COMMA, "COMMA"},
-        {TokenType::DOT, "DOT"}, {TokenType::COLON, "COLON"},
-        {TokenType::NUMBER, "NUMBER"}, {TokenType::IDENTIFIER, "IDENTIFIER"},
-        {TokenType::AUTO, "AUTO"}, {TokenType::BREAK, "BREAK"}, {TokenType::CASE, "CASE"},
-        {TokenType::CHAR, "CHAR"}, {TokenType::CONST, "CONST"}, {TokenType::CONTINUE, "CONTINUE"},
-        {TokenType::DEFAULT, "DEFAULT"}, {TokenType::DO, "DO"}, {TokenType::DOUBLE, "DOUBLE"},
-        {TokenType::ELSE, "ELSE"}, {TokenType::ENUM, "ENUM"}, {TokenType::EXTERN, "EXTERN"},
-        {TokenType::FLOAT, "FLOAT"}, {TokenType::FOR, "FOR"}, {TokenType::GOTO, "GOTO"},
-        {TokenType::IF, "IF"}, {TokenType::INLINE, "INLINE"}, {TokenType::INT, "INT"},
-        {TokenType::LONG, "LONG"}, {TokenType::REGISTER, "REGISTER"}, {TokenType::RESTRICT, "RESTRICT"},
-        {TokenType::RETURN, "RETURN"}, {TokenType::SHORT, "SHORT"}, {TokenType::SIGNED, "SIGNED"},
-        {TokenType::SIZEOF, "SIZEOF"}, {TokenType::STATIC, "STATIC"}, {TokenType::STRUCT, "STRUCT"},
-        {TokenType::SWITCH, "SWITCH"}, {TokenType::TYPEDEF, "TYPEDEF"}, {TokenType::UNION, "UNION"},
-        {TokenType::UNSIGNED, "UNSIGNED"}, {TokenType::VOID, "VOID"}, {TokenType::VOLATILE, "VOLATILE"},
-        {TokenType::WHILE, "WHILE"}, {TokenType::_BOOL, "_Bool"}, {TokenType::_COMPLEX, "_Complex"},
-        {TokenType::_IMAGINARY, "_Imaginary"}, {TokenType::EOF_TOKEN, "EOF_TOKEN"}
-    };
-    auto it = tokenTypeStrings.find(type);
-    if (it != tokenTypeStrings.end()) {
-        return it->second;
+    switch (type) {
+        // 运算符
+        case TokenType::PLUS:             return "PLUS";
+        case TokenType::MINUS:            return "MINUS";
+        case TokenType::MULTIPLY:         return "MULTIPLY";
+        case TokenType::DIVIDE:           return "DIVIDE";
+        case TokenType::EQUAL:            return "EQUAL";
+        case TokenType::NOT_EQUAL:        return "NOT_EQUAL";
+        case TokenType::LESS:             return "LESS";
+        case TokenType::GREATER:          return "GREATER";
+        case TokenType::LESS_EQUAL:       return "LESS_EQUAL";
+        case TokenType::GREATER_EQUAL:    return "GREATER_EQUAL";
+        case TokenType::ASSIGNMENT:       return "ASSIGNMENT";
+        case TokenType::BANG:             return "BANG";
+
+        // 分隔符
+        case TokenType::LEFT_PAREN:       return "LEFT_PAREN";
+        case TokenType::RIGHT_PAREN:      return "RIGHT_PAREN";
+        case TokenType::SEMICOLON:        return "SEMICOLON";
+        case TokenType::LEFT_BRACE:       return "LEFT_BRACE";
+        case TokenType::RIGHT_BRACE:      return "RIGHT_BRACE";
+        case TokenType::COMMA:            return "COMMA";
+        case TokenType::DOT:              return "DOT";
+        case TokenType::COLON:            return "COLON";
+
+        // 字面量
+        case TokenType::NUMBER:           return "NUMBER";
+        case TokenType::IDENTIFIER:       return "IDENTIFIER";
+
+        // 关键字（C99）
+        case TokenType::AUTO:             return "AUTO";
+        case TokenType::BREAK:            return "BREAK";
+        case TokenType::CASE:             return "CASE";
+        case TokenType::CHAR:             return "CHAR";
+        case TokenType::CONST:            return "CONST";
+        case TokenType::CONTINUE:         return "CONTINUE";
+        case TokenType::DEFAULT:          return "DEFAULT";
+        case TokenType::DO:               return "DO";
+        case TokenType::DOUBLE:           return "DOUBLE";
+        case TokenType::ELSE:             return "ELSE";
+        case TokenType::ENUM:             return "ENUM";
+        case TokenType::EXTERN:           return "EXTERN";
+        case TokenType::FLOAT:            return "FLOAT";
+        case TokenType::FOR:              return "FOR";
+        case TokenType::GOTO:             return "GOTO";
+        case TokenType::IF:               return "IF";
+        case TokenType::INLINE:           return "INLINE";
+        case TokenType::INT:              return "INT";
+        case TokenType::LONG:             return "LONG";
+        case TokenType::REGISTER:         return "REGISTER";
+        case TokenType::RESTRICT:         return "RESTRICT";
+        case TokenType::RETURN:           return "RETURN";
+        case TokenType::SHORT:            return "SHORT";
+        case TokenType::SIGNED:           return "SIGNED";
+        case TokenType::SIZEOF:           return "SIZEOF";
+        case TokenType::STATIC:           return "STATIC";
+        case TokenType::STRUCT:           return "STRUCT";
+        case TokenType::SWITCH:           return "SWITCH";
+        case TokenType::TYPEDEF:          return "TYPEDEF";
+        case TokenType::UNION:            return "UNION";
+        case TokenType::UNSIGNED:         return "UNSIGNED";
+        case TokenType::VOID:             return "VOID";
+        case TokenType::VOLATILE:         return "VOLATILE";
+        case TokenType::WHILE:            return "WHILE";
+        case TokenType::_BOOL:            return "_BOOL";
+        case TokenType::_COMPLEX:         return "_COMPLEX";
+        case TokenType::_IMAGINARY:       return "_IMAGINARY";
+        
+        // 注释
+        case TokenType::SINGLE_LINE_COMMENT: return "SINGLE_LINE_COMMENT";
+        case TokenType::MULTI_LINE_COMMENT:   return "MULTI_LINE_COMMENT";
+
+        case TokenType::EOF_TOKEN:        return "EOF_TOKEN";
+
+        default:                          return "UNKNOWN";
     }
-    return "UNKNOWN";
+}
+
+void printToken(const Token &token)
+{
+    QString typeString = getTokenTypeString(token.type);
+    QString valueString = token.value.isEmpty() ? "N/A" : token.value;
+    qDebug() << "Token Type:" << typeString
+             << ", Value:" << valueString
+             << ", Line:" << token.line;
+}
+
+void printTokens(const QVector<Token> &tokens)
+{
+    for (const Token &token : tokens) {
+        printToken(token);
+    }
 }

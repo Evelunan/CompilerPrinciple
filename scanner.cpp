@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <cctype>
 
+
 Scanner::Scanner(const QString& source)
     : source(source), start(0), current(0), line(1) {}
 
@@ -58,13 +59,19 @@ void Scanner::scanToken() {
         case '+': addToken(TokenType::PLUS); break;
         case '-': addToken(TokenType::MINUS); break;
         case '*': addToken(TokenType::MULTIPLY); break;
-        case '/': addToken(TokenType::DIVIDE); break;
+
+        case '/':
+            // 不是注释，视为除号
+            if (!tryConsumeComment())
+                addToken(TokenType::DIVIDE);
+            break;
+
         case '<':
-            if (match('=')) addToken(TokenType::LESS);
+            if (match('=')) addToken(TokenType::LESS_EQUAL);
             else addToken(TokenType::LESS);
             break;
         case '>':
-            if (match('=')) addToken(TokenType::GREATER);
+            if (match('=')) addToken(TokenType::GREATER_EQUAL);
             else addToken(TokenType::GREATER);
             break;
         case '=':
@@ -73,7 +80,7 @@ void Scanner::scanToken() {
             break;
         case '!':
             if (match('=')) addToken(TokenType::NOT_EQUAL);
-            else qWarning() << "Unexpected character at line" << line;
+            else addToken(TokenType::BANG);
             break;
         case ';': addToken(TokenType::SEMICOLON); break;
         case ' ': case '\r': case '\t': break; // 忽略空白字符
@@ -147,4 +154,37 @@ void Scanner::identifier() {
 void Scanner::number() {
     while (peek().isDigit()) advance();
     addToken(TokenType::NUMBER);
+}
+
+bool Scanner::tryConsumeComment() {
+    if (peek() == '/') {
+        // 单行注释: 跳过直到换行
+        while (peek() != '\n' && !isAtEnd()) advance();
+        addToken(TokenType::SINGLE_LINE_COMMENT);
+        return true;
+    }
+    if (peek() == '*') {
+        // 多行注释: 跳过直到 '*/'
+        advance(); advance(); // 跳过 '/*'
+
+        bool closed = false;
+        while (!isAtEnd()) {
+            QChar c = advance();
+            if (c == '*' && peek() == '/') {
+                advance(); // 跳过 '/'
+                closed = true;
+                break;
+            }
+            if (c == '\n') line++; // 更新行号
+        }
+
+        if (!closed) {
+            qWarning() << "Unterminated multi-line comment at line" << line;
+        } else {
+            addToken(TokenType::MULTI_LINE_COMMENT);
+        }
+        return true;
+    }
+
+    return false; // 没有识别到注释
 }

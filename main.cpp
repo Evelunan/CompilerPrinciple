@@ -1,43 +1,24 @@
-#include <QCoreApplication>
-#include <QString>
-#include <QVector>
-#include <QDebug>
 #include "scanner.h"
-#include "token.h"
-
+#include "parser.h"
+#include <QCoreApplication>
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication app(argc, argv);
 
-    // 测试源代码字符串
     QString source = R"(
-        int main() {
-            int a = 5;
-            int b = 0;
-            if (a > 5) {
-                b = a * 2;
-            } else {
-                b = 3;
-            }
+        int a = 5;
+        int b = !a;
 
-            while (b > 0) {
-                b = b - 1;
-            }
-
-            return 0;
-        }
+        a = a + 1;
+        b = b - 1;
     )";
-
-    // 创建 Scanner 实例并扫描 Tokens
     Scanner scanner(source);
     QVector<Token> tokens = scanner.scanTokens();
 
-    // 打印所有 Tokens
-    foreach (const Token &token, tokens)
-    {
-        qDebug() << "[Line" << token.line << "] Type:" << getTokenTypeString(token.type)
-                 << ", Value:" << token.value;
-    }
+    printTokens(tokens);
+    
+    // Parser parser(tokens);
+    // parser.parse();
 
-    return a.exec();
+    return 0;
 }
