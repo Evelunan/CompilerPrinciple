@@ -24,6 +24,7 @@ enum class TokenType {
 
     // 字面量
     NUMBER, IDENTIFIER,
+    
 
     // 关键字（完整C99标准）
     AUTO, BREAK, CASE, CHAR, CONST, CONTINUE, DEFAULT, DO, DOUBLE, ELSE,

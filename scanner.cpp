@@ -151,16 +151,24 @@ void Scanner::identifier() {
     }
 }
 
+
 void Scanner::number() {
-    while (peek().isDigit()) advance();
+    while (peek().isDigit()) advance(); // 整数部分
+
+    if (peek() == '.' && peekNext().isDigit()) {
+        advance(); // 跳过 .
+        while (peek().isDigit()) advance(); // 小数部分
+    }
+
     addToken(TokenType::NUMBER);
 }
+
 
 bool Scanner::tryConsumeComment() {
     if (peek() == '/') {
         // 单行注释: 跳过直到换行
         while (peek() != '\n' && !isAtEnd()) advance();
-        addToken(TokenType::SINGLE_LINE_COMMENT);
+        // addToken(TokenType::SINGLE_LINE_COMMENT);
         return true;
     }
     if (peek() == '*') {
@@ -181,7 +189,7 @@ bool Scanner::tryConsumeComment() {
         if (!closed) {
             qWarning() << "Unterminated multi-line comment at line" << line;
         } else {
-            addToken(TokenType::MULTI_LINE_COMMENT);
+            // addToken(TokenType::MULTI_LINE_COMMENT);
         }
         return true;
     }
